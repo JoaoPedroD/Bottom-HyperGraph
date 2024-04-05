@@ -1,10 +1,28 @@
 import re
+import torch
 import subprocess
 import numpy as np
 import hypernetx as hnx
-from os import makedirs, getcwd
-import torch_geometric.utils as tutils
 from tqdm.notebook import tqdm
+from os import makedirs, getcwd
+from torch_geometric.data import Data
+import torch_geometric.utils as tutils
+
+def get_modes(path_modes:str) -> dict:
+    tipos = {}
+    with open(path_modes, "r") as f:
+        for l in f.readlines():
+            # print(l)
+            temp = re.findall(r'modeb\([\*\d]+,[ ]?([a-z\d_]+\([a-z\d\+\-\#, \_]+\))', l.strip())
+            
+            if len(temp)==0:continue
+            # print(temp)
+            temp = temp[0]
+            pred = re.findall(r'([a-z\d_]+)\(', temp)[0]
+            tipo = re.findall(r'[\+\-\,\(](\#?[a-z]+)', temp)
+            if pred not in tipos:
+                tipos[pred] = [i for i in tipo]
+    return tipos
 
 def create_subhgraphs(bottoms, modes, symbols, predicates, types, sat):
     dataset = []
@@ -100,7 +118,7 @@ def createHfrombot(bot,modes,aresta = 0):
 def aleph_settings(mode_file, bk_file, depth, data_files={}):
     script_lines = []
     # script_lines += [f':- set(verbosity, 0).']
-    script_lines += [f':- set(i,{depth+1}).']
+    script_lines += [f':- set(i,{depth}).']
     # script_lines += [f':- set(check_useless,true).']
     script_lines += [f':- set(minpos,2).']
     for set_name, data_file in data_files.items():
