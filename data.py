@@ -24,11 +24,11 @@ def get_modes(path_modes:str) -> dict:
                 tipos[pred] = [i for i in tipo]
     return tipos
 
-def create_subhgraphs(bottoms, modes, symbols, predicates, types, sat):
+def create_subhgraphs(bottoms, modes, symbols, predicates, types):
     dataset = []
     y = []
     for targets, pin in enumerate(["neg","pos"]):
-        for bottom,s in tqdm(zip(bottoms[pin],sat[pin]), desc="feats"):
+        for bottom in tqdm(bottoms[pin], desc="feats"):
             subh = hnx.Hypergraph(createHfrombot(bottom,modes))
             nodes = list(subh.nodes)
             hedges = list(subh.edges)
